@@ -10,7 +10,7 @@ import Admin from './pages/Admin';
 const App: React.FC = () => (
   <AuthProvider>
     <CMSProvider>
-      <Router basename="/Itar-template1/">
+      <Router basename="/">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
