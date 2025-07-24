@@ -5,14 +5,16 @@ import { uploadImage } from '../../utils/imageUpload';
 
 const WorkGalleryEditor: React.FC = () => {
   const { content, updateSection } = useCMSContext();
-  const gallery = content.gallery ?? { images: [] };
-  const [images, setImages] = useState(gallery.images);
+  const gallery = content?.gallery ?? { images: [] };
+  const [images, setImages] = useState<string[]>(gallery.images);
   const [message, setMessage] = useState('');
 
   // Sync with CMS context if content changes externally
   useEffect(() => {
-    setImages(content.gallery.images);
-  }, [content.gallery.images]);
+    if (content?.gallery?.images) {
+        setImages(content.gallery.images);
+      }
+  }, [content?.gallery?.images]);
 
   const handleImageChange = async (idx: number, file: File) => {
     const url = await uploadImage(file);

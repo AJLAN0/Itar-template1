@@ -1,0 +1,7 @@
+[
+    {
+      "origin": ["http://localhost:5173", "https://itar-template1.web.app"],
+      "method": ["GET", "POST", "PUT"],
+      "maxAgeSeconds": 3600
+    }
+  ]
