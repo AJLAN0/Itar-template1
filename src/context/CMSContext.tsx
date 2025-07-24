@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { CMSContent } from '../types';
 import { defaultCMSContent } from '../types';
-import { doc, updateDoc, setDoc,onSnapshot } from 'firebase/firestore';
+import { doc, setDoc,onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
 
 interface CMSContextType {
@@ -13,8 +13,8 @@ const CMSContext = createContext<CMSContextType | undefined>(undefined);
 
 const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [content, setContent] = useState<CMSContent>(defaultCMSContent);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  // const [loading, setLoading] = useState(true);
+  // const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const docRef = doc(db, 'cms', 'homepage');
@@ -23,13 +23,13 @@ const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       (docSnap) => {
         if (docSnap.exists()) {
           setContent(docSnap.data() as CMSContent);
-          setLoading(false);
+          // setLoading(false);
         }
       },
-      (err) => {
-        setError(err.message);
-        setLoading(false);
-      }
+      // (err) => {
+      //   // setError(err.message);
+      //   // setLoading(false);
+      // }
     );
     return () => unsubscribe();
   }, []);

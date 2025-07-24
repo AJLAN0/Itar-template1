@@ -23,7 +23,6 @@ const sectionComponents: Record<string, React.FC> = {
 const Admin: React.FC = () => {
   const [active, setActive] = useState('hero');
   const Section = sectionComponents[active];
-  const HeroEditor = React.lazy(() => import('../admin/sections/HeroEditor'));
 
 
   return (
