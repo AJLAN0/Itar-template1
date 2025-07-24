@@ -23,6 +23,8 @@ const sectionComponents: Record<string, React.FC> = {
 const Admin: React.FC = () => {
   const [active, setActive] = useState('hero');
   const Section = sectionComponents[active];
+  const HeroEditor = React.lazy(() => import('../admin/sections/HeroEditor'));
+
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -30,7 +32,9 @@ const Admin: React.FC = () => {
       <div className="flex-1 flex flex-col">
         <Header />
         <main className="flex-1 overflow-y-auto p-8">
+        <React.Suspense fallback={<div>Loading...</div>}>
           <Section />
+        </React.Suspense>
         </main>
       </div>
     </div>

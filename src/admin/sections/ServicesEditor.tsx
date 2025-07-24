@@ -4,7 +4,8 @@ import { useCMSContext } from '../../context/CMSContext';
 
 const ServicesEditor: React.FC = () => {
   const { content, updateSection } = useCMSContext();
-  const [services, setServices] = useState(content.services);
+  const initialServices = content.services ?? [];
+  const [services, setServices] = useState(initialServices);
   const [message, setMessage] = useState('');
 
   const handleServiceChange = (idx: number, field: string, value: string) => {

@@ -1,15 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import SectionEditor from '../../components/admin/SectionEditor';
 import { useCMSContext } from '../../context/CMSContext';
 
 const HeroEditor: React.FC = () => {
   const { content, updateSection } = useCMSContext();
-  const [name, setName] = useState(content.hero.name);
-  const [career, setCareer] = useState(content.hero.career);
-  const [image, setImage] = useState(content.hero.image);
+  const hero = content.hero ?? { name: '', career: '', image: '' };
+  const [name, setName] = useState(hero.name);
+  const [career, setCareer] = useState(hero.career);
+  const [image, setImage] = useState(hero.image);
   const [message, setMessage] = useState('');
 
-  // Optional: handle image upload
+  // Sync local state with CMS context when content.hero changes
+  useEffect(() => {
+    setName(content.hero.name);
+    setCareer(content.hero.career);
+    setImage(content.hero.image);
+  }, [content.hero.name, content.hero.career, content.hero.image]);
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -20,16 +27,17 @@ const HeroEditor: React.FC = () => {
   };
 
   const handleSave = () => {
+    console.log('[CMS] Saving hero section:', { name, career, image });
     updateSection('hero', { name, career, image });
     setMessage('Saved!');
     setTimeout(() => setMessage(''), 2000);
   };
 
   const handlePublish = () => {
+    console.log('[CMS] Publishing hero section:', { name, career, image });
     updateSection('hero', { name, career, image });
     setMessage('Published!');
     setTimeout(() => setMessage(''), 2000);
-    // Optionally, add logic to mark as published or trigger a deploy
   };
 
   return (

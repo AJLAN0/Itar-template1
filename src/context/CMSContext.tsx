@@ -1,26 +1,43 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import type { CMSContent } from '../types'; // adjust path if needed
-import { defaultCMSContent } from '../types'; // adjust path if needed
+import type { CMSContent } from '../types';
+import { defaultCMSContent } from '../types';
+import { doc, updateDoc, setDoc,onSnapshot } from 'firebase/firestore';
+import { db } from '../firebase';
 
 interface CMSContextType {
   content: CMSContent;
-  updateSection: (section: keyof CMSContent, value: any) => void;
+  updateSection: (section: keyof CMSContent, value: any) => Promise<void>;
 }
 
 const CMSContext = createContext<CMSContextType | undefined>(undefined);
 
 const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [content, setContent] = useState<CMSContent>(defaultCMSContent);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const stored = localStorage.getItem('cmsContent');
-    if (stored) setContent(JSON.parse(stored));
+    const docRef = doc(db, 'cms', 'homepage');
+    const unsubscribe = onSnapshot(
+      docRef,
+      (docSnap) => {
+        if (docSnap.exists()) {
+          setContent(docSnap.data() as CMSContent);
+          setLoading(false);
+        }
+      },
+      (err) => {
+        setError(err.message);
+        setLoading(false);
+      }
+    );
+    return () => unsubscribe();
   }, []);
 
-  const updateSection = (section: keyof CMSContent, value: any) => {
-    const updated = { ...content, [section]: value };
-    setContent(updated);
-    localStorage.setItem('cmsContent', JSON.stringify(updated));
+  const updateSection = async (section: keyof CMSContent, value: any) => {
+    const docRef = doc(db, 'cms', 'homepage');
+    await setDoc(docRef, { [section]: value }, { merge: true });
+    console.log("Saving:", section, value);
   };
 
   return (

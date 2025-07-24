@@ -4,9 +4,10 @@ import { useCMSContext } from '../../context/CMSContext';
 
 const AboutEditor: React.FC = () => {
   const { content, updateSection } = useCMSContext();
-  const [name, setName] = useState(content.about.name);
-  const [text, setText] = useState(content.about.text);
-  const [paragraph, setParagraph] = useState(content.about.paragraph);
+  const about = content.about ?? { name: '', text: '', paragraph: '' };
+  const [name, setName] = useState(about.name);
+  const [text, setText] = useState(about.text);
+  const [paragraph, setParagraph] = useState(about.paragraph);
   const [message, setMessage] = useState('');
 
   const handleSave = () => {
