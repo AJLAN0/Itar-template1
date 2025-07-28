@@ -5,6 +5,7 @@ import { auth } from '../firebase';
 
 type AuthContextType = {
   user: User | null;
+  loading: boolean; // NEW
   login: (email: string, password: string, remember?: boolean) => Promise<boolean>;
   logout: () => Promise<void>;
 };
@@ -13,15 +14,16 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      console.log('Auth state changed →', firebaseUser); // ✅ See if user is auto-restored
       setUser(firebaseUser);
+      setLoading(false); // <- Done loading
     });
-
-    return () => unsubscribe(); // Clean up listener on unmount
+    return () => unsubscribe();
   }, []);
+
 
   const login = async (email: string, password: string, remember: boolean = true) => {
     try {
@@ -40,7 +42,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

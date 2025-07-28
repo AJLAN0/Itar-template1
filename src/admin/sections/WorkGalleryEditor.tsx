@@ -35,6 +35,7 @@ const WorkGalleryEditor: React.FC = () => {
     setTimeout(() => setMessage(''), 2000);
   };
   const handlePublish = () => {
+    console.log("Publishing images:", images);
     updateSection('gallery', { images });
     setMessage('Published!');
     setTimeout(() => setMessage(''), 2000);

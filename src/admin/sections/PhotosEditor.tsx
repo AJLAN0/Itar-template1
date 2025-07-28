@@ -6,7 +6,7 @@ import { uploadImage } from '../../utils/imageUpload';
 const PhotosEditor: React.FC = () => {
   const { content, updateSection } = useCMSContext();
   const featured = content.featured ?? { images: [] };
-  const [images, setImages] = useState(featured.images);
+  const [images, setImages] = useState<string[]>(featured.images);
   const [message, setMessage] = useState('');
 
   const handleImageChange = async (idx: number, file: File) => {
@@ -14,11 +14,17 @@ const PhotosEditor: React.FC = () => {
     setImages(images.map((img, i) => (i === idx ? url : img)));
   };
 
+  const handleAddImage = () => {
+    if (images.length >= 2) return; // لا تضيف إذا كان هناك صورتان بالفعل
+    setImages([...images, '']);
+  };
+
   const handleSave = () => {
     updateSection('featured', { images });
     setMessage('Saved!');
     setTimeout(() => setMessage(''), 2000);
   };
+
   const handlePublish = () => {
     updateSection('featured', { images });
     setMessage('Published!');
@@ -30,18 +36,40 @@ const PhotosEditor: React.FC = () => {
       <form className="space-y-4" onSubmit={e => e.preventDefault()}>
         {images.map((img, idx) => (
           <div key={idx} className="flex items-center gap-4 mb-2">
-            <img src={img} alt={`Featured ${idx + 1}`} className="h-24 rounded" />
+            {img && <img src={img} alt={`Featured ${idx + 1}`} className="h-24 rounded" />}
             <input
               type="file"
               onChange={e => {
                 if (e.target.files?.[0]) handleImageChange(idx, e.target.files[0]);
               }}
             />
+            <button
+              type="button"
+              onClick={() => setImages(images.filter((_, i) => i !== idx))}
+              className="text-red-500 px-2"
+            >
+              Remove
+            </button>
           </div>
         ))}
+
+{images.length < 2 && (
+  <button
+    type="button"
+    onClick={handleAddImage}
+    className="bg-gray-200 px-3 py-1 rounded"
+  >
+    Add Image
+  </button>
+)}
+
         <div className="flex gap-4 mt-4">
-          <button type="button" onClick={handleSave} className="bg-blue-600 text-white px-4 py-2 rounded">Save</button>
-          <button type="button" onClick={handlePublish} className="bg-green-600 text-white px-4 py-2 rounded">Publish</button>
+          <button type="button" onClick={handleSave} className="bg-blue-600 text-white px-4 py-2 rounded">
+            Save
+          </button>
+          <button type="button" onClick={handlePublish} className="bg-green-600 text-white px-4 py-2 rounded">
+            Publish
+          </button>
         </div>
         {message && <div className="text-green-600 mt-2">{message}</div>}
       </form>

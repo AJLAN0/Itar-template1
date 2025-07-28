@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import SectionEditor from '../../components/admin/SectionEditor';
 import { useCMSContext } from '../../context/CMSContext';
+import { uploadImage } from '../../utils/imageUpload';
 
 const HeroEditor: React.FC = () => {
   const { content, updateSection } = useCMSContext();
-  const hero = content.hero ?? { name: '', career: '', image: '' };
+  const hero = content?.hero || { name: '', career: '', image: '' };
   const [name, setName] = useState(hero.name);
   const [career, setCareer] = useState(hero.career);
   const [image, setImage] = useState(hero.image);
@@ -12,17 +13,24 @@ const HeroEditor: React.FC = () => {
 
   // Sync local state with CMS context when content.hero changes
   useEffect(() => {
-    setName(content.hero.name);
-    setCareer(content.hero.career);
-    setImage(content.hero.image);
-  }, [content.hero.name, content.hero.career, content.hero.image]);
+    setName(hero.name || '');
+    setCareer(hero.career || '');
+    setImage(hero.image || '');
+  }, [hero.name, hero.career, hero.image]);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (ev) => setImage(ev.target?.result as string);
-      reader.readAsDataURL(file);
+    if (!file) return;
+  
+    try {
+      const url = await uploadImage(file);
+      if (url) {
+        setImage(url);
+      } else {
+        console.error("Image upload returned empty URL.");
+      }
+    } catch (err) {
+      console.error("Image upload failed:", err);
     }
   };
 

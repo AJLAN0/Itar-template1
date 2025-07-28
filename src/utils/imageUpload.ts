@@ -1,11 +1,19 @@
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { storage } from '../firebase';
-
 export const uploadImage = async (file: File): Promise<string> => {
-  const fileRef = ref(storage, `images/${file.name}`);
-  await uploadBytes(fileRef, file);
-  const url = await getDownloadURL(fileRef);
-  return url; // Save this URL in Firestore as part of your content
-};
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset", "itar-temp"); // ✅ الاسم يجب أن يكون صحيح 100%
 
-export default uploadImage;
+  const response = await fetch("https://api.cloudinary.com/v1_1/dzc6gle9t/image/upload", {
+    method: "POST",
+    body: formData,
+  });
+
+  const data = await response.json();
+
+  if (!data.secure_url) {
+    console.error("Image upload failed:", data);
+    return ""; // ترجع قيمة فاضية وتمنع التخزين الخاطئ
+  }
+
+  return data.secure_url;
+};

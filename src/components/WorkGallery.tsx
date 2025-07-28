@@ -4,7 +4,7 @@ import { useCMSContext } from '../context/CMSContext';
 const WorkGallery: React.FC = () => {
   const { content } = useCMSContext();
   const images = content?.gallery?.images ?? [];
-
+  console.log('Gallery Images →', images);
   return (
     <section className="py-16 px-4 bg-white" id="work">
       <div className="max-w-5xl mx-auto">

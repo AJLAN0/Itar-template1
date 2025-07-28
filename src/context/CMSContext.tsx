@@ -1,47 +1,50 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { CMSContent } from '../types';
 import { defaultCMSContent } from '../types';
-import { doc, setDoc,onSnapshot } from 'firebase/firestore';
+import { doc, setDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
 
 interface CMSContextType {
   content: CMSContent;
   updateSection: (section: keyof CMSContent, value: any) => Promise<void>;
+  siteId: string;
 }
 
 const CMSContext = createContext<CMSContextType | undefined>(undefined);
 
+const getSubdomain = () => {
+  if (typeof window !== 'undefined') {
+    const [sub] = window.location.hostname.split('.');
+    return sub;
+  }
+  return 'default'; // fallback for SSR/local dev
+};
+
 const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [content, setContent] = useState<CMSContent>(defaultCMSContent);
-  // const [loading, setLoading] = useState(true);
-  // const [error, setError] = useState<string | null>(null);
+  const siteId = getSubdomain();
 
   useEffect(() => {
-    const docRef = doc(db, 'cms', 'homepage');
+    const docRef = doc(db, 'cms', siteId);
     const unsubscribe = onSnapshot(
       docRef,
       (docSnap) => {
         if (docSnap.exists()) {
           setContent(docSnap.data() as CMSContent);
-          // setLoading(false);
         }
-      },
-      // (err) => {
-      //   // setError(err.message);
-      //   // setLoading(false);
-      // }
+      }
     );
     return () => unsubscribe();
-  }, []);
+  }, [siteId]);
 
   const updateSection = async (section: keyof CMSContent, value: any) => {
-    const docRef = doc(db, 'cms', 'homepage');
+    const docRef = doc(db, 'cms', siteId);
     await setDoc(docRef, { [section]: value }, { merge: true });
     console.log("Saving:", section, value);
   };
 
   return (
-    <CMSContext.Provider value={{ content, updateSection }}>
+    <CMSContext.Provider value={{ content, updateSection, siteId }}>
       {children}
     </CMSContext.Provider>
   );
