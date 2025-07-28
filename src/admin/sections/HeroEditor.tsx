@@ -10,13 +10,16 @@ const HeroEditor: React.FC = () => {
   const [career, setCareer] = useState(hero.career);
   const [image, setImage] = useState(hero.image);
   const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
 
   // Sync local state with CMS context when content.hero changes
   useEffect(() => {
-    setName(hero.name || '');
-    setCareer(hero.career || '');
-    setImage(hero.image || '');
-  }, [hero.name, hero.career, hero.image]);
+    if (content?.hero) {
+      setName(content.hero.name || '');
+      setCareer(content.hero.career || '');
+      setImage(content.hero.image || '');
+    }
+  }, [content.hero]);
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -34,10 +37,11 @@ const HeroEditor: React.FC = () => {
     }
   };
 
-  const handleSave = () => {
-    console.log('[CMS] Saving hero section:', { name, career, image });
-    updateSection('hero', { name, career, image });
+  const handleSave = async () => {
+    setLoading(true);
+    await updateSection('hero', { name, career, image });
     setMessage('Saved!');
+    setLoading(false);
     setTimeout(() => setMessage(''), 2000);
   };
 
@@ -70,7 +74,7 @@ const HeroEditor: React.FC = () => {
         />
         {image && <img src={image} alt="Preview" className="h-24 rounded" />}
         <div className="flex gap-4">
-          <button type="button" onClick={handleSave} className="bg-blue-600 text-white px-4 py-2 rounded">Save</button>
+          <button type="button" onClick={handleSave} disabled={loading}  className="bg-blue-600 text-white px-4 py-2 rounded">{loading ? "Saving..." : "Save"}</button>
           <button type="button" onClick={handlePublish} className="bg-green-600 text-white px-4 py-2 rounded">Publish</button>
         </div>
         {message && <div className="text-green-600 mt-2">{message}</div>}
