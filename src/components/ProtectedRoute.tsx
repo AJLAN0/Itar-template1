@@ -11,24 +11,27 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 
   useEffect(() => {
     if (!user) return;
-
+  
     const checkPermission = async () => {
       const docRef = doc(db, 'users', user.uid);
       const snap = await getDoc(docRef);
-
+      console.log('[DEBUG] Loaded user document:', snap.exists());
+  
       if (snap.exists()) {
         const siteId = snap.data().siteId;
         const currentSubdomain = window.location.hostname.split('.')[0];
-
+        console.log('[DEBUG] Comparing subdomain:', siteId, currentSubdomain);
+  
         if (siteId === currentSubdomain) {
           setAllowed(true);
         }
       }
-      setChecked(true);
+      setChecked(true); // ✅ Always call this, even if snap doesn't exist
     };
-
+  
     checkPermission();
   }, [user]);
+  
 
   if (!user) return <Navigate to="/login" replace />;
   if (!checked) return <div>Loading...</div>;
