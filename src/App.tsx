@@ -17,9 +17,7 @@ const App: React.FC = () => (
           <Route
             path="/admin"
             element={
-              <ProtectedRoute>
                 <Admin />
-              </ProtectedRoute>
             }
           />
         </Routes>
