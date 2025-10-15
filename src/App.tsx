@@ -8,7 +8,7 @@ import Login from './pages/Login';
 import Admin from './pages/Admin';
 
 const App: React.FC = () => (
-<AuthProvidor>
+<AuthProvider>
     <CMSProvider>
       <Router>
         <Routes>
@@ -25,7 +25,7 @@ const App: React.FC = () => (
         </Routes>
       </Router>
     </CMSProvider>
-</AuthProvidor>
+</AuthProvider>
 );
 
 export default App;
